@@ -1,6 +1,16 @@
 //http://stackoverflow.com/questions/15867478/build-tree-type-list-by-recursively-checking-parent-child-relationship-c-sharp
 
-public class TreeList
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ProcessTree
+{
+    class Program
+    {
+        public class TreeList
         {
             public int ID { get; set; }
 
@@ -25,6 +35,7 @@ public class TreeList
                         new TreeList() { ID = 9, ParentID = 8 }
                 };
                 var tree = BuildTree(t);
+                var flat = FlattenTree(tree.Where(obj=>obj.ID==1).FirstOrDefault());
                 Console.WriteLine("Recursion ended");
             }
             catch (Exception ex)
@@ -34,7 +45,30 @@ public class TreeList
             Console.ReadLine();
         }
 
-        private static List<TreeList> BuildTree(List<TreeList> items) {
+        //Build the tree
+        private static List<TreeList> BuildTree(List<TreeList> items)
+        {
             items.ForEach(i => i.Children = items.Where(ch => ch.ParentID == i.ID).ToList());
             return items.Where(i => i.ParentID == null).ToList();
         }
+
+        //Flatten the tree- Depth first
+        public static List<TreeList> FlattenTree(TreeList root)
+        {
+
+            var flattened = new List<TreeList> { root };
+
+            var children = root.Children;
+
+            if (children != null)
+            {
+                foreach (var child in children)
+                {
+                    flattened.AddRange(FlattenTree(child));
+                }
+            }
+
+            return flattened;
+        }
+    }
+}
